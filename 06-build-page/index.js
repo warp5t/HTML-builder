@@ -82,8 +82,8 @@ function cssCopying() {
         const filePath = path.join(pathCSS, file);
         fs.readFile(filePath, 'utf8', (errr, fileCont) => {
           if (errr) { stdout.write(errr); }
-          fs.appendFile(pathCopyCSS, fileCont, (err, data) => {
-            if (err) stdout.write(err);
+          fs.appendFile(pathCopyCSS, fileCont, (err85, data) => {
+            if (err85) stdout.write(err85);
           });
         });
       }
@@ -123,4 +123,41 @@ function fileFolderCreating() {
   });
 }
 
-fileFolderCreating();
+const pathArr = [pathFontsCopy, pathImgCopy, pathSvgCopy];
+
+function clearing() {
+  let permCSS = false;
+  let permHtml = false;
+  pathArr.forEach((element) => {
+    fs.readdir(element, (err127, files) => {
+      if (err127) stdout.write(err127);
+      files.forEach((file) => {
+        const pathFile = path.join(element, file);
+        fs.unlink(pathFile, (err133, data) => {
+          if (err133) stdout.write(err133);
+        });
+      });
+      fs.rmdir(element, (err138, data) => {
+        if (err138) stdout.write(err138);
+      });
+    });
+  });
+  fs.unlink(fileIndexHtml, (err144, data) => {
+    if (err144) stdout.write(err144);
+    fs.unlink(pathCopyCSS, (err146, data) => {
+      if (err146) stdout.write(err146);
+      fs.rmdir(pathNewAssets, (err149) => {
+        if (err149) stdout.write(err149);
+      });
+      fs.rmdir(path.join(__dirname, 'project-dist'), (err152) => {
+        if (err152) stdout.write(err152);
+      });
+    });
+  });
+}
+
+clearing();
+
+setTimeout(() => {
+  fileFolderCreating();
+}, 1800);
