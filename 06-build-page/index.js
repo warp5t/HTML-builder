@@ -75,9 +75,7 @@ fs.mkdir(distFolder, { recursive: true }, (err) => {
   const copyFolder = (src, dest) => { fs.mkdir(dest, { recursive: true }, (err) => {
       if (err) throw err;
 
-      fs.readdir(src, {
-        withFileTypes: true
-      }, (err, entries) => {
+      fs.readdir(src, { withFileTypes: true }, (err, entries) => {
         if (err) throw err;
 
         let pending = entries.length;
