@@ -3,14 +3,15 @@ const path = require('path');
 
 const distFolder = path.join(__dirname, 'project-dist');
 
+// create directory
 fs.mkdir(distFolder, { recursive: true }, (err) => {
   if (err) throw err;
 
+  // 1: HTML
   const templatePath = path.join(__dirname, 'template.html');
   const componentsFolder = path.join(__dirname, 'components');
   const outputHTML = path.join(distFolder, 'index.html');
 
-  // html
   fs.readFile(templatePath, 'utf-8', (err, template) => {
     if (err) throw err;
 
@@ -27,29 +28,35 @@ fs.mkdir(distFolder, { recursive: true }, (err) => {
           if (err) throw err;
 
           template = template.replace(`{{${componentName}}}`, componentContent);
+
           pending -= 1;
 
           if (pending === 0) {
             fs.writeFile(outputHTML, template, (err) => {
               if (err) throw err;
-              console.log('HTML is finished');
+              console.log('HTML assembled!');
             });
           }
         });
       });
     });
   });
-// styles css
+
+  // 2: css
   const stylesFolder = path.join(__dirname, 'styles');
   const outputCSS = path.join(distFolder, 'style.css');
 
   fs.readdir(stylesFolder, { withFileTypes: true }, (err, files) => {
     if (err) throw err;
 
+    const cssFiles = files.filter(
+      (file) => file.isFile() && path.extname(file.name) === '.css'
+    );
+
     let cssContent = '';
     let pending = cssFiles.length;
 
-    files.forEach((file) => {
+    cssFiles.forEach((file) => {
       const filePath = path.join(stylesFolder, file.name);
 
       fs.readFile(filePath, 'utf-8', (err, data) => {
@@ -62,17 +69,19 @@ fs.mkdir(distFolder, { recursive: true }, (err) => {
         if (pending === 0) {
           fs.writeFile(outputCSS, cssContent, (err) => {
             if (err) throw err;
-            console.log('Styles are finished');
+            console.log('Styles assembled!');
           });
         }
       });
     });
   });
 
+  // 3: copy assets
   const assetsFolder = path.join(__dirname, 'assets');
   const outputAssets = path.join(distFolder, 'assets');
 
-  const copyFolder = (src, dest) => { fs.mkdir(dest, { recursive: true }, (err) => {
+  const copyFolder = (src, dest) => {
+    fs.mkdir(dest, { recursive: true }, (err) => {
       if (err) throw err;
 
       fs.readdir(src, { withFileTypes: true }, (err, entries) => {
@@ -89,7 +98,7 @@ fs.mkdir(distFolder, { recursive: true }, (err) => {
           if (entry.isDirectory()) {
             copyFolder(srcPath, destPath);
             pending -= 1;
-            if (pending === 0) console.log('Assets copied');
+            if (pending === 0) console.log('Assets copied!');
           } else {
             fs.copyFile(srcPath, destPath, (err) => {
               if (err) throw err;
